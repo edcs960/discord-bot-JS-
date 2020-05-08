@@ -1,0 +1,270 @@
+
+const request = require('request');
+  var server;
+  var level;
+  var job;
+  var nickname;
+  var style;
+  var Popularity;
+  var Guild;
+  var rank;
+  var compre_rank;
+  var world_rank;
+  var Woccupa_rank;
+  var Coccupa_rank;
+  var dojang_chack;
+  var dojang_floor;
+  var dojang_time;
+  var dojang_worldrank
+  var dojang_rank;
+  var dojang;
+  var union;
+  var union_chack;
+  var union_rate;
+  var union_level;
+  var union_fightingpower;
+  var union_worldrank;
+  var union_rank;
+  var theseed;
+  var theseed_chack;
+  var theseed_floor;
+  var theseed_time;
+  var theseed_worldrank;
+  var theseed_rank;
+  var Achieve;
+  var Achieve_chack;
+  var Achieve_rate;
+  var Achieve_score;
+  var Achieve_worldrank;
+  var Achieve_rank;
+  var player_inf1;
+  
+
+  var regex= /[a-z0-9]|[ \[\]{}()<>?|`~!@#$%^&*-_+=,.;:\"'\\]/g;
+  var S_regex = /[\[\]{}()<>?|`~!@#$%^&*-_+=,.;:\"'\\]/g
+  var H_regex = /[^가-힣]/g;
+  var T_regex= /[^0-9가-힣]/g;
+  var N_regex = /[^0-9,]/g;
+  var G_regex = /[^a-zA-z가-힣]/g
+  
+  
+
+      
+  //!메이플랭킹 cooosla
+  module.exports = {
+	name: '메이플랭킹',
+	description: 'Ping!',
+  execute(message, args, Discord) 
+  {
+    var url = 'https://maple.gg/u/' + args[1];
+    url = encodeURI(url);
+    console.log(url);
+    request.get({uri:url}, function(error,response,body)
+    {
+      // 서버 정보 추출
+      server = body.substring(body.indexOf("<img class=\"align-middle\""),body.lastIndexOf("width=\"16\">"));
+      server = server.replace(regex,'');
+      server = server.replace(/\s/g,'');
+
+      // 닉네임
+      nickname = args[1];
+
+      // 캐릭터 레벨 정보 추출
+      level = body.substring(body.indexOf("user-summary-list"),body.lastIndexOf("user-summary-item")-50);
+      level = level.replace(N_regex,'');
+      
+      // 직업 정보 추출
+      job = body.substring(body.indexOf("<div class=\"user-summary\""),body.lastIndexOf("summary-item\"><span>"));
+      job = job.replace(regex,'');
+      job = job.replace(/\n/g,'');
+      job = job.replace(/\s/g,'');
+      
+      // 캐릭터 이미지 추출
+      style = body.substring(body.indexOf("img id=\"character-avatar\"")+31,body.indexOf("data-proxy-url")-2);
+      style = style.replace(/\n/g,'');
+      style = style.replace(/\s/g,'');
+
+      // 인기도 정보 추출
+      Popularity = body.substring(body.indexOf("인기도"),body.indexOf("</span></li>"));
+      Popularity = Popularity.replace(N_regex,'');
+
+      // 길드 정보 추출
+      Guild = body.substring(body.indexOf(level + " | " + job),body.indexOf("mobileWebUrl")-40);
+      Guild = Guild.replace(/인기도/,'');
+      Guild = Guild.replace(/길드/,'');
+      Guild = Guild.replace(job,'');
+      Guild = Guild.replace(/[0-9]/g,'');
+      Guild = Guild.replace(G_regex,'');
+      if(Guild == '' )
+      {
+        Guild = "(없음)";
+      }
+
+      // 캐릭터 랭킹 정보 추출
+      if(level>=210)
+      {
+        compre_rank = body.substring(body.indexOf("종합랭킹"),body.indexOf("월드랭킹")-150);
+        compre_rank = compre_rank.replace(N_regex,'');
+        
+        world_rank = body.substring(body.indexOf("월드랭킹"),body.indexOf("직업랭킹(월드)")-150);
+        world_rank = world_rank.replace(N_regex,'');
+        
+        Woccupa_rank = body.substring(body.indexOf("직업랭킹(월드)"),body.indexOf("직업랭킹(전체)")-150);
+        Woccupa_rank = Woccupa_rank.replace(N_regex,'');
+
+        Coccupa_rank = body.substring(body.indexOf("직업랭킹(전체)"),body.indexOf("user-buttons mt")-50);
+        Coccupa_rank = Coccupa_rank.replace(N_regex,'');
+
+        rank = "종합랭킹 : " + compre_rank + "위\n월드랭킹 : " + world_rank + "위\n직업랭킹(월드) : " + Woccupa_rank + "위\n직업랭킹(전체) : " + Coccupa_rank + "위";
+      }
+      else
+      {
+        compre_rank = body.substring(body.indexOf("종합랭킹"),body.indexOf("월드랭킹")-150);
+        compre_rank = compre_rank.replace(N_regex,'');
+        compre_rank =  compre_rank;
+
+        rank = "종합랭킹 : " + compre_rank + "위\n월드랭킹 : 210이상 캐릭터만 표시\n직업랭킹(월드) : 210이상 캐릭터만 표시\n직업랭킹(전체) : 210이상 캐릭터만 표시";
+      }
+      
+      // 무릉도장 정보 추출
+      dojang_chack = body.substring(body.indexOf("최고기록"),body.indexOf("더시드 최고기록"));
+
+      if(dojang_chack.indexOf("text-secondary") == -1)
+      {
+        dojang_floor = body.substring(body.indexOf("최고기록")+399,body.indexOf("user-summary-duration"));
+        dojang_floor = dojang_floor.replace(/h1/,'');
+        dojang_floor = dojang_floor.replace(T_regex,'');
+        
+        dojang_time = body.substring(body.indexOf("user-summary-duration"),body.indexOf("더시드 최고기록")-1100);
+        dojang_time = dojang_time.replace(T_regex,'');
+        
+        dojang_worldrank = body.substring(body.indexOf("user-summary-box-footer")+361,body.indexOf("더시드 최고기록")-755);
+        dojang_worldrank = dojang_worldrank.replace(N_regex,'');
+
+        dojang_rank = body.substring(body.indexOf("user-summary-box-footer")+370,body.indexOf("더시드 최고기록")-500);
+        dojang_rank = dojang_rank.replace(N_regex,'');
+
+        dojang = "최고기록 : " + dojang_floor + "( " +  dojang_time + " )\n월드랭킹 : " + dojang_worldrank + "위\n전체랭킹 : " + dojang_rank + "위"
+      }
+      else
+      {
+        dojang = "기록이 없습니다.";
+      }
+
+      // 유니온 정보 추출
+      union_chack = body.substring(body.indexOf("유니온 정보"),body.indexOf("box-header bg-grape-fruit"));
+
+      if(union_chack.indexOf("text-secondary") == -1)
+      {
+        union_rate = body.substring(body.indexOf("user-summary-tier-string font-weight-bold")+43,body.indexOf("user-summary-level")-60);
+        union_rate = union_rate.replace(/\n/g,'');
+        union_rate = union_rate.replace(/\s/g,'');
+
+        union_level = body.substring(body.indexOf("user-summary-level"),body.indexOf("전투력")-100);
+        union_level = union_level.replace(N_regex,'');
+
+        union_fightingpower = body.substring(body.indexOf("전투력"),body.indexOf("box-header bg-grape-fruit")-850);
+        union_fightingpower = union_fightingpower.replace(N_regex,'');
+
+        union_worldrank = body.substring(body.indexOf("전투력")+170,body.indexOf("box-header bg-grape-fruit")-700);
+        union_worldrank = union_worldrank.replace(N_regex,'');
+
+        union_rank = body.substring(body.indexOf("전투력")+200,body.indexOf("box-header bg-grape-fruit")-600)
+        union_rank = union_rank.replace(N_regex,'');
+
+        union = "등급 : " + union_rate + "\n총 레벨 : Lv." + union_level + "\n전투력 : " + union_fightingpower + "\n월드랭킹 : " + union_worldrank + "위\n전체랭킹 : " + union_rank + "위";
+      }
+      else
+      {
+        union = "기록이 없습니다.";
+      }
+
+      // 더 시드정보 추출
+
+      theseed_chack = body.substring(body.indexOf("더시드 최고기록"),body.indexOf("유니온 정보"));
+
+      if(theseed_chack.indexOf("text-secondary") == -1)
+      {
+        theseed_floor = body.substring(body.indexOf("더시드 최고기록")+300,body.indexOf("유니온 정보")-1570);
+        theseed_floor = theseed_floor.replace(/h1/,'');
+        theseed_floor = theseed_floor.replace(N_regex,'');
+
+        theseed_time = body.substring(body.indexOf("더시드 최고기록")+420,body.indexOf("유니온 정보")-1470);
+        theseed_time = theseed_time.replace(T_regex,'');
+
+        theseed_worldrank = body.substring(body.indexOf("더시드 최고기록")+1020,body.indexOf("유니온 정보")-870);
+        theseed_worldrank = theseed_worldrank.replace(N_regex,'');
+
+        theseed_rank = body.substring(body.indexOf("더시드 최고기록")+1120,body.indexOf("유니온 정보")-770);
+        theseed_rank = theseed_rank.replace(N_regex,'');
+        
+
+        theseed = "최고기록 : " + theseed_floor + "층 ( " + theseed_time + " )" + "\n월드랭킹 : " + theseed_worldrank + "위\n전체랭킹 : " + theseed_rank + "위";
+      }
+      else
+      {
+        theseed = "기록이 없습니다."
+      }
+
+      // 업적 정보 추출
+
+      Achieve_chack = body.substring(body.indexOf("업적 정보는"),body.indexOf("코디 컬렉션"));
+
+      if(Achieve_chack.indexOf("text-secondary") == -1)
+      {
+        Achieve_rate = body.substring(body.indexOf("업적 정보는")+550,body.indexOf("코디 컬렉션")-1300);
+        Achieve_rate = Achieve_rate.replace(H_regex,'');
+
+        Achieve_score = body.substring(body.indexOf("업적 정보는")+650,body.indexOf("코디 컬렉션")-1200);
+        Achieve_score = Achieve_score.replace(N_regex,'');
+
+        Achieve_worldrank = body.substring(body.indexOf("업적 정보는")+1200,body.indexOf("코디 컬렉션")-650);
+        Achieve_worldrank = Achieve_worldrank.replace(N_regex,'');
+
+        Achieve_rank = body.substring(body.indexOf("업적 정보는")+1300,body.indexOf("코디 컬렉션")-550);
+        Achieve_rank = Achieve_rank.replace(N_regex,'');
+
+        Achieve = "등급 : " + Achieve_rate + "\n업적 점수 : " + Achieve_score + "점\n월드랭킹 : " + Achieve_worldrank  + "위\n전체랭킹 : " + Achieve_rank + "위";
+      }
+      else
+      {
+        Achieve = "기록이 없습니다."
+      }
+      
+      player_inf1 = server.concat(" - ",nickname);
+      
+      console.log(server + "\n");
+      console.log(nickname + "\n");
+      console.log(job + "\n");
+      console.log(style + "\n");
+      console.log(Popularity + "\n");
+      console.log(Guild + "\n");
+      console.log(rank + "\n");
+      console.log(dojang + "\n");
+      console.log(union + "\n");
+      console.log(theseed + "\n");
+      console.log(Achieve + "\n");
+
+      const exampleEmbed = new Discord.MessageEmbed()
+      exampleEmbed.setColor('#146eff')
+      exampleEmbed.setTitle(player_inf1)
+      exampleEmbed.setURL(url)
+      exampleEmbed.addFields(
+          { name: '직업', value: job + "( Lv." + level + " )"},
+          { name: '인기도', value: Popularity},
+          { name: '길드', value: Guild },
+          { name: '랭킹', value: rank },
+          { name: '유니온', value: union },
+          { name: '무릉도장', value: dojang },
+          { name: '더시드', value: theseed },
+          { name: '업적', value: Achieve }, 
+      )
+      exampleEmbed.attachFiles([style])
+      exampleEmbed.setThumbnail(style)
+        message.reply('님에 대한 응답' , exampleEmbed) 
+
+      }
+    )
+  }
+}
+  
