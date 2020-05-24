@@ -1,0 +1,203 @@
+const request = require('request');
+
+var solo;
+var solo_chack;
+var solo_playtime;
+var solo_score;
+var solo_kd;
+var solo_winningrate;
+var solo_dealingamount;
+var solo_playgamecount;
+var solo_maximumkillcount;
+var solo_headshot;
+var solo_sniperdistance;
+var solo_survivaltime;
+
+var Duo;
+var Duo_chack;
+var Duo_playtime;
+var Duo_kd;
+var Duo_winningrate;
+var Duo_dealingamount;
+var Duo_playgamecount;
+var Duo_maximumkillcount;
+var Duo_headshot;
+var Duo_sniperdistance;
+var Duo_survivaltime;
+
+var Squad;
+var Squad_chack;
+var Squad_playtime;
+var Squad_kd;
+var Squad_winningrate;
+var Squad_dealingamount;
+var Squad_playgamecount;
+var Squad_maximumkillcount;
+var Squad_headshot;
+var Squad_sniperdistance;
+var Squad_survivaltime;
+
+var regex= /[a-z0-9]|[ \[\]{}()<>?|`~!@#$%^&*-_+=,.;:\"'\\]/g;
+var S_regex = /[\[\]{}()<>?|`~!@#$%^&*-_+=,.;:\"'\\]/g
+var H_regex = /[^가-힣]/g;
+var T_regex= /[^0-9가-힣]/g;
+var N_regex = /[^0-9,]/g;
+var G_regex = /[^a-zA-z가-힣]/g
+
+module.exports = {
+  name: '배그',
+  description: 'Ping!',
+execute(message, args, Discord) 
+{
+  var url = 'https://dak.gg/profile/' + args[1];
+  url = encodeURI(url);
+  console.log(url);
+  request.get({uri:url}, function(error,response,body)
+  {
+    solo_chack = body.substring(body.indexOf("solo modeItem"),body.indexOf("duo modeItem")-900);
+
+    if(solo_chack.indexOf("div class=\"no_record\"") == -1)
+    {
+      solo_playtime = body.substring(body.indexOf("solo modeItem")+870,body.indexOf("duo modeItem")-16200);
+      solo_playtime = solo_playtime.replace(/\s/g,'');
+      
+      solo_score = body.substring(body.indexOf("solo modeItem")+1100,body.indexOf("duo modeItem")-16020);
+      solo_score = solo_score.replace(/\s/g,'');
+
+      solo_kd = body.substring(body.indexOf("solo modeItem")+4100,body.indexOf("duo modeItem")-12800);
+      solo_kd = solo_kd.replace(/[^0-9.]/g,'');
+      
+      solo_winningrate = body.substring(body.indexOf("solo modeItem")+5000,body.indexOf("duo modeItem")-11500);
+      solo_winningrate = solo_winningrate.replace(/\n/g,'');
+      solo_winningrate = solo_winningrate.replace(/[^0-9.]/g,'');
+
+      solo_dealingamount = body.substring(body.indexOf("solo modeItem")+7800,body.indexOf("duo modeItem")-9000);
+      solo_dealingamount = solo_dealingamount.replace(N_regex,'');
+
+      solo_playgamecount = body.substring(body.indexOf("solo modeItem")+8800,body.indexOf("duo modeItem")-8000);
+      solo_playgamecount = solo_playgamecount.replace(N_regex,'');
+
+      solo_maximumkillcount = body.substring(body.indexOf("solo modeItem")+10000,body.indexOf("duo modeItem")-6900);
+      solo_maximumkillcount = solo_maximumkillcount.replace(N_regex,'');
+
+      solo_headshot = body.substring(body.indexOf("solo modeItem")+11000,body.indexOf("duo modeItem")-5500);
+      solo_headshot = solo_headshot.replace(/[^0-9.]/g,'');
+
+      solo_sniperdistance = body.substring(body.indexOf("solo modeItem")+12500,body.indexOf("duo modeItem")-4500);
+      solo_sniperdistance = solo_sniperdistance.replace(/[^0-9.]/g,'');
+
+      solo_survivaltime = body.substring(body.indexOf("solo modeItem")+13700,body.indexOf("duo modeItem")-3450);
+      solo_survivaltime = solo_survivaltime.replace(/\n/g,'');
+      solo_survivaltime = solo_survivaltime.replace(/\s/g,'');
+
+      solo = "누적 플레이시간 : " + solo_playtime + "\n전적 : " + solo_score + "\nK/D : " + solo_kd + "\n승률 : " + solo_winningrate + "%\n평균 딜량 : " + solo_dealingamount + "\n게임 수 : " + solo_playgamecount + "\n최다킬수 : " + solo_maximumkillcount + "\n헤드샷 : " + solo_headshot + "%\n저격 : " + solo_sniperdistance + "m\n생존 시간 : " + solo_survivaltime;
+    }
+    else
+    {
+      solo = '-';
+    }
+
+    Duo_chack = body.substring(body.indexOf("duo modeItem"),body.indexOf("squad modeItem")-900);
+
+    if(Duo_chack.indexOf("div class=\"no_record\"") == -1)
+    {
+    Duo_playtime = body.substring(body.indexOf("duo modeItem")+870,body.indexOf("squad modeItem")-16150);
+    Duo_playtime = Duo_playtime.replace(/\s/g,'');
+    
+    Duo_score = body.substring(body.indexOf("duo modeItem")+1100,body.indexOf("squad modeItem")-15890);
+    Duo_score = Duo_score.replace(/[^0-9WTL]/g,'');
+    Duo_score = Duo_score.replace(/\s/g,'');
+
+    Duo_kd = body.substring(body.indexOf("duo modeItem")+4100,body.indexOf("squad modeItem")-12800);
+    Duo_kd = Duo_kd.replace(/[^0-9.]/g,'');
+    
+    Duo_winningrate = body.substring(body.indexOf("duo modeItem")+5000,body.indexOf("squad modeItem")-11500);
+    Duo_winningrate = Duo_winningrate.replace(/\n/g,'');
+    Duo_winningrate = Duo_winningrate.replace(/[^0-9.]/g,'');
+
+    Duo_dealingamount = body.substring(body.indexOf("duo modeItem")+7800,body.indexOf("squad modeItem")-9000);
+    Duo_dealingamount = Duo_dealingamount.replace(N_regex,'');
+
+    Duo_playgamecount = body.substring(body.indexOf("duo modeItem")+8800,body.indexOf("squad modeItem")-8000);
+    Duo_playgamecount = Duo_playgamecount.replace(N_regex,'');
+
+    Duo_maximumkillcount = body.substring(body.indexOf("duo modeItem")+10000,body.indexOf("squad modeItem")-6900);
+    Duo_maximumkillcount = Duo_maximumkillcount.replace(N_regex,'');
+
+    Duo_headshot = body.substring(body.indexOf("duo modeItem")+11000,body.indexOf("squad modeItem")-5500);
+    Duo_headshot = Duo_headshot.replace(/[^0-9.]/g,'');
+
+    Duo_sniperdistance = body.substring(body.indexOf("duo modeItem")+12500,body.indexOf("squad modeItem")-4500);
+    Duo_sniperdistance = Duo_sniperdistance.replace(/[^0-9.]/g,'');
+
+    Duo_survivaltime = body.substring(body.indexOf("duo modeItem")+13650,body.indexOf("squad modeItem")-3450);
+    Duo_survivaltime = Duo_survivaltime.replace(/\n/g,'');
+    Duo_survivaltime = Duo_survivaltime.replace(/\s/g,'');
+
+    Duo = "누적 플레이시간 : " + Duo_playtime + "\n전적 : " + Duo_score + "\nK/D : " + Duo_kd + "\n승률 : " + Duo_winningrate + "%\n평균 딜량 : " + Duo_dealingamount + "\n게임 수 : " + Duo_playgamecount + "\n최다킬수 : " + Duo_maximumkillcount + "\n헤드샷 : " + Duo_headshot + "%\n저격 : " + Duo_sniperdistance + "m\n생존 시간 : " + Duo_survivaltime;
+    }
+    else
+    {
+      Duo = '-';
+    }
+
+    Squad_chack = body.substring(body.indexOf("squad modeItem"),body.indexOf("pa_top2 pa_top2-big")-900);
+
+    if(Squad_chack.indexOf("div class=\"no_record\"") == -1)
+    {
+    Squad_playtime = body.substring(body.indexOf("squad modeItem")+870,body.indexOf("pa_top2 pa_top2-big")-16180);
+    Squad_playtime = Squad_playtime.replace(/\s/g,'');
+    
+    Squad_score = body.substring(body.indexOf("squad modeItem")+1100,body.indexOf("pa_top2 pa_top2-big")-15950);
+    Squad_score = Squad_score.replace(/[^0-9WTL]/g,'');
+    Squad_score = Squad_score.replace(/\s/g,'');
+
+    Squad_kd = body.substring(body.indexOf("squad modeItem")+4100,body.indexOf("pa_top2 pa_top2-big")-12800);
+    Squad_kd = Squad_kd.replace(/[^0-9.]/g,'');
+    
+    Squad_winningrate = body.substring(body.indexOf("squad modeItem")+5000,body.indexOf("pa_top2 pa_top2-big")-11500);
+    Squad_winningrate = Squad_winningrate.replace(/\n/g,'');
+    Squad_winningrate = Squad_winningrate.replace(/[^0-9.]/g,'');
+
+    Squad_dealingamount = body.substring(body.indexOf("squad modeItem")+7800,body.indexOf("pa_top2 pa_top2-big")-9000);
+    Squad_dealingamount = Squad_dealingamount.replace(N_regex,'');
+
+    Squad_playgamecount = body.substring(body.indexOf("squad modeItem")+8800,body.indexOf("pa_top2 pa_top2-big")-8000);
+    Squad_playgamecount = Squad_playgamecount.replace(N_regex,'');
+
+    Squad_maximumkillcount = body.substring(body.indexOf("squad modeItem")+10000,body.indexOf("pa_top2 pa_top2-big")-6900);
+    Squad_maximumkillcount = Squad_maximumkillcount.replace(N_regex,'');
+
+    Squad_headshot = body.substring(body.indexOf("squad modeItem")+11000,body.indexOf("pa_top2 pa_top2-big")-5500);
+    Squad_headshot = Squad_headshot.replace(/[^0-9.]/g,'');
+
+    Squad_sniperdistance = body.substring(body.indexOf("squad modeItem")+12500,body.indexOf("pa_top2 pa_top2-big")-4500);
+    Squad_sniperdistance = Squad_sniperdistance.replace(/[^0-9.]/g,'');
+
+    Squad_survivaltime = body.substring(body.indexOf("squad modeItem")+13650,body.indexOf("pa_top2 pa_top2-big")-3470);
+    Squad_survivaltime = Squad_survivaltime.replace(/\n/g,'');
+    Squad_survivaltime = Squad_survivaltime.replace(/\s/g,'');
+
+    Squad = "누적 플레이시간 : " + Squad_playtime + "\n전적 : " + Squad_score + "\nK/D : " + Squad_kd + "\n승률 : " + Squad_winningrate + "%\n평균 딜량 : " + Squad_dealingamount + "\n게임 수 : " + Squad_playgamecount + "\n최다킬수 : " + Squad_maximumkillcount + "\n헤드샷 : " + Squad_headshot + "%\n저격 : " + Squad_sniperdistance + "m\n생존 시간 : " + Squad_survivaltime;
+    }
+    else
+    {
+      Squad = '-';
+    }
+
+    const exampleEmbed = new Discord.MessageEmbed()
+    exampleEmbed.setColor('#146eff')
+    exampleEmbed.setTitle(args[1])
+    exampleEmbed.setURL(url)
+    exampleEmbed.addFields(
+        { name: '솔로', value: solo },
+        { name: '듀오', value: Duo },
+        { name: '스쿼드', value: Squad },
+    )
+      message.reply('님에 대한 응답' , exampleEmbed) 
+
+    }
+  )
+}
+}
+
